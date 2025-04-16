@@ -1,0 +1,83 @@
+-- Table des utilisateurs
+CREATE TABLE utilisateurs (
+    id_utilisateur NUMBER PRIMARY KEY,
+    nom_utilisateur VARCHAR2(100) NOT NULL,
+    email VARCHAR2(100) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR2(255) NOT NULL,
+    date_creation DATE DEFAULT SYSDATE
+);
+
+-- Table des médecins
+CREATE TABLE medecins (
+    id_medecin NUMBER PRIMARY KEY,
+    nom_medecin VARCHAR2(100) NOT NULL,
+    specialite VARCHAR2(100) NOT NULL,
+    photo VARCHAR2(255), -- URL de la photo du médecin
+    date_creation DATE DEFAULT SYSDATE
+);
+
+-- Table des services
+CREATE TABLE services (
+    id_service NUMBER PRIMARY KEY,
+    nom_service VARCHAR2(100) NOT NULL,
+    description VARCHAR2(255)
+);
+
+-- Table des rendez-vous
+CREATE TABLE rendezvous (
+    id_rendezvous NUMBER PRIMARY KEY,
+    id_utilisateur NUMBER,
+    id_medecin NUMBER,
+    id_service NUMBER,
+    date_rendezvous DATE,
+    heure_rendezvous VARCHAR2(5),
+    statut VARCHAR2(50) DEFAULT 'à venir', -- Statut: à venir, complété, annulé
+    FOREIGN KEY (id_utilisateur) REFERENCES utilisateurs(id_utilisateur),
+    FOREIGN KEY (id_medecin) REFERENCES medecins(id_medecin),
+    FOREIGN KEY (id_service) REFERENCES services(id_service)
+);
+-- Table des dossiers medicales
+CREATE TABLE dossier_medical (
+    id_dossier NUMBER PRIMARY KEY,
+    id_patient NUMBER,
+    id_medecin NUMBER,
+    description VARCHAR2(1000),
+    date_creation DATE DEFAULT SYSDATE,
+    FOREIGN KEY (id_patient) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_medecin) REFERENCES utilisateur(id_utilisateur)
+);
+-- Table des disponiblite
+CREATE TABLE disponibilite (
+    id_disponibilite NUMBER PRIMARY KEY,
+    id_medecin NUMBER,
+    date_dispo DATE,
+    heure_debut VARCHAR2(5),
+    heure_fin VARCHAR2(5),
+    FOREIGN KEY (id_medecin) REFERENCES utilisateur(id_utilisateur)
+);
+-- Table des notflication email
+CREATE TABLE notification_email (
+    id_notification NUMBER PRIMARY KEY,
+    id_patient NUMBER,
+    id_rendezvous NUMBER,
+    statut_envoi VARCHAR2(20) DEFAULT 'non envoyé', -- envoyé, non envoyé
+    date_envoi DATE,
+    FOREIGN KEY (id_patient) REFERENCES utilisateur(id_utilisateur),
+    FOREIGN KEY (id_rendezvous) REFERENCES rendezvous(id_rendezvous)
+);
+
+-- Insertion de données initiales dans la table des utilisateurs
+INSERT INTO utilisateurs (id_utilisateur, nom_utilisateur, email, mot_de_passe)
+VALUES (1, 'John Doe', 'johndoe@example.com', 'password123');
+
+-- Insertion de données initiales dans la table des médecins
+INSERT INTO medecins (id_medecin, nom_medecin, specialite, photo)
+VALUES (1, 'Dr. Olivia Turner', 'Dermato-endocrinologie', 'https://via.placeholder.com/120');
+
+-- Insertion de données initiales dans la table des services
+INSERT INTO services (id_service, nom_service, description)
+VALUES (1, 'Consultation générale', 'Consultation pour des questions médicales générales.');
+
+-- Insertion de données initiales dans la table des rendez-vous
+INSERT INTO rendezvous (id_rendezvous, id_utilisateur, id_medecin, id_service, date_rendezvous, heure_rendezvous, statut)
+VALUES (1, 1, 1, 1, TO_DATE('2025-05-12', 'YYYY-MM-DD'), '14:30', 'à venir');
